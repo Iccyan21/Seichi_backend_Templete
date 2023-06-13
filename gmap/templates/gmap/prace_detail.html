@@ -1,0 +1,12 @@
+<h1>{{ prace.name }}</h1>
+<p>{{ prace.address }}</p>
+
+<h2>投稿一覧</h2>
+<ul>
+  {% for post in posts %}
+    <li>{{ post.title }}</li>
+    <li>{{ post.content }}</li>
+  {% empty %}
+    <li>投稿はありません</li>
+  {% endfor %}
+</ul>

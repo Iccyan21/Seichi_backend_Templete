@@ -1,0 +1,19 @@
+<h1>Search Results</h1>
+
+<form method="GET" action="{% url 'search_customers' %}">
+  <input type="text" name="q" value="{{ query }}">
+  <button type="submit">Search</button>
+</form>
+
+<ul>
+  {% for customer in customers %}
+  <li>
+    <h2>{{ customer.name }}</h2>
+    <p>Address: {{ customer.address }}</p>
+    <p>Latitude: {{ customer.lat }}</p>
+    <p>Longitude: {{ customer.lng }}</p>
+  </li>
+  {% empty %}
+  <li>No results found.</li>
+  {% endfor %}
+</ul>

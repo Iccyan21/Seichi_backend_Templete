@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="searchForm" style="margin-bottom: 20px;">
+      <input type="text" id="searchInput" placeholder="Search by name...">
+      <button type="submit">Search</button>
+    </form>
+    <div id="map"></div>
+    <script>
+// 検索フォームのイベントリスナーを追加
+      document.getElementById('searchForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var query = document.getElementById('searchInput').value;
+        searchCustomers(query);
+      });
+
+      // 顧客を検索する関数
+      function searchCustomers(query) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            var customers = JSON.parse(this.responseText);
+            setMarker(customers);
+          }
+        };
+        xhttp.open('GET', 'api/customer/?format=json&q=' + encodeURIComponent(query), true);
+        xhttp.setRequestHeader('Content-type', 'application/json');
+        xhttp.send();
+      }
+      var map;
+
+      /**
+       * The CenterControl adds a control to the map that recenters the map on
+       * Chicago.
+       * This constructor takes the control DIV as an argument.
+       * @constructor
+       */
+      function CenterControl(controlDiv, map) {
+
+        // Set CSS for the control border.
+        var controlUI = document.createElement('div');
+        controlUI.style.backgroundColor = '#fff';
+        controlUI.style.border = '2px solid #fff';
+        controlUI.style.borderRadius = '3px';
+        controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+        controlUI.style.cursor = 'pointer';
+        controlUI.style.marginBottom = '22px';
+        controlUI.style.textAlign = 'center';
+        controlUI.title = 'Click to recenter the map';
+        controlDiv.appendChild(controlUI);
+
+        // Set CSS for the control interior.
+        var controlText = document.createElement('div');
+        controlText.style.color = 'rgb(25,25,25)';
+        controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+        controlText.style.fontSize = '16px';
+        controlText.style.lineHeight = '38px';
+        controlText.style.paddingLeft = '5px';
+        controlText.style.paddingRight = '5px';
+        controlText.innerHTML = 'Customer Search';
+        controlUI.appendChild(controlText);
+
+        controlUI.addEventListener('click', function() {
+
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+               if (this.readyState == 4 && this.status == 200) {
+                 setMarker(JSON.parse(this.responseText));
+               }
+          };
+          xhttp.open("GET", "api/customer/?format=json", true);
+          xhttp.setRequestHeader("Content-type", "application/json");
+          xhttp.send();
+
+        });
+
+      }
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 35.681236, lng: 139.767125},
+          zoom: 8
+        });
+
+        var centerControlDiv = document.createElement('div');
+        var centerControl = new CenterControl(centerControlDiv, map);
+
+        centerControlDiv.index = 1;
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+
+      }
+
+      function setMarker(customerJson) {
+
+        for(var i = 0; i < customerJson.length; i++){
+
+          var infowindow = new google.maps.InfoWindow({
+            content: customerJson[i].name + ' ' + customerJson[i].address
+          });
+
+          var marker = new google.maps.Marker({
+            position: {lat: Number(customerJson[i].lat), lng: Number(customerJson[i].lng)},
+            map: map
+
+          });
+          infowindow.open(map, marker);
+          bindInfoWindow(marker, map, infowindow,customerJson[i].placeId, customerJson[i].name);
+          console.log(customerJson[i].name);
+        }
+      }
+      console.log(marker)
+      function bindInfoWindow(marker, map, infowindow) {
+
+        marker.addListener('click', function() {
+          infowindow.open(map, this);
+          
+        // 詳細ページへの遷移
+        var url = '/parace/' + encodeURIComponent(marker.name) + '/';
+        window.location.href = url;
+        });
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyANo-MndvZ0THsRxGEaTBHUfRCUXLv3w2g&callback=initMap"
+    async defer></script>
+  </body>
+</html>
