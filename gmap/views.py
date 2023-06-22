@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from .models import Customer
 from .serializers import CustomerSerializer
 from post.models import Post
-
+from urllib.parse import unquote
 
 def index(request):
     template = loader.get_template('gmap/index.html')
@@ -35,7 +35,10 @@ class CandidateDataAPI(APIView):
         try:
             customer = self.get_queryset().get(name=name)
             serializer = CustomerSerializer(customer)
-            return Response(serializer.data)
+            data = serializer.data
+            data['image'] = unquote(data['image'])
+            return Response(data)
+            
         except Customer.DoesNotExist:
             return Response(status=404)
 

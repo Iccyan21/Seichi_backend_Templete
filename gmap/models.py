@@ -12,7 +12,8 @@ class Customer(models.Model):
     lat = models.DecimalField('緯度', max_digits=8, decimal_places=6)
     lng = models.DecimalField('経度', max_digits=9, decimal_places=6)
     animeid = models.ForeignKey(Anime, on_delete=models.PROTECT,to_field='amineid',  related_name='anime')
-    
+    image = models.ImageField('画像', upload_to='customer_images/')
+     
     objects = CustomerManager()
 
     def __str__(self):

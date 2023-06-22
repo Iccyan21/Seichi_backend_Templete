@@ -18,6 +18,9 @@ from gmap.models import Customer
 from django.urls import path
 from django.conf.urls import include
 from rest_framework import routers, serializers, viewsets
+from django.conf import settings
+from django.contrib.staticfiles.urls import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 class CustomerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -42,3 +45,9 @@ urlpatterns = [
     path('anime/', include('anime.urls')),
     
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )
