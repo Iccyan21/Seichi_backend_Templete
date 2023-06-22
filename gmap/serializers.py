@@ -4,5 +4,5 @@ from .models import Customer
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['PraceID','name', 'address','lat','lng']  # シリアライズするフィールドのリスト
+        fields = ['PraceID','animeid','name', 'address','lat','lng']  # シリアライズするフィールドのリスト
         

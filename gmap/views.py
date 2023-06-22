@@ -26,12 +26,33 @@ def parace(request,name):
     }
     return render(request,'gmap/prace.html',params)
 
+
 class CandidateDataAPI(APIView):
-     permission_classes = [IsAuthenticatedOrReadOnly]
-     def get(self, request, name):
-        queryset = Customer.objects.filter(name=name)  # nameに基づいてフィルタリング
-        serializer = CustomerSerializer(queryset, many=True)  # 複数のオブジェクトをシリアライズする場合はmany=Trueを指定
-        return Response(serializer.data)
+    def get_queryset(self):
+        return Customer.objects.all()
+
+    def get(self, request, name):
+        try:
+            customer = self.get_queryset().get(name=name)
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        except Customer.DoesNotExist:
+            return Response(status=404)
+
+
+class CandidateDataIntAPI(APIView):
+    def get_queryset(self):
+        return Customer.objects.all()
+
+    def get(self, request, animeid):
+        try:
+            customer = self.get_queryset().filter(animeid=animeid)
+            serializer = CustomerSerializer(customer, many=True)
+            return Response(serializer.data)
+        except Customer.DoesNotExist:
+            return Response(status=404)
+
+
 
 def prace_detail(request, name):
     prace = get_object_or_404(Customer, name=name)
